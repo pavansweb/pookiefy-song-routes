@@ -212,5 +212,6 @@ def song_info_to_audio():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
-    songRoutes.run(debug=True, port=2007)
- 
+    import os
+    port = int(os.environ.get("PORT", 5000))  # Use Render's dynamic PORT or default to 5000
+    songRoutes.run(host="0.0.0.0", port=port, debug=True)

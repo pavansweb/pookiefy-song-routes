@@ -63,7 +63,9 @@ def get_spotify_token():
         spotify_token_cache['token'] = token  # Cache the token
     return token
 
-
+@songRoutes.route('/', methods=['POST'])
+def nothing():
+ return 1
 @songRoutes.route('/search-spotify-song', methods=['POST'])
 def search_spotify_song():
     try:

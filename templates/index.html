@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask API Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #2d3e50;
+            text-align: center;
+        }
+        h2 {
+            color: #34495e;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        pre {
+            background-color: #2d3e50;
+            color: #ecf0f1;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 14px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #2980b9;
+        }
+        .code-snippet {
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin-top: 10px;
+        }
+        .response-box {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            border: 1px solid #bdc3c7;
+        }
+        .response-box h3 {
+            margin-top: 0;
+        }
+        .loading {
+            font-size: 18px;
+            color: #f39c12;
+            font-weight: bold;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .test-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+        .test-buttons button {
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Flask API Documentation</h1>
+
+    <div class="section">
+        <h2>1. Search Spotify Song</h2>
+        <p>This route allows you to search for songs on Spotify by a search term.</p>
+        <h3>Endpoint:</h3>
+        <p><code>POST /search-spotify-song</code></p>
+        <h3>Request Body:</h3>
+        <pre>
+{
+    "searchTerm": "song or artist name"
+}
+        </pre>
+        <h3>Response:</h3>
+        <pre>
+{
+    "success": true,
+    "songs": [
+        {
+            "name": "Song Name",
+            "artists": [{"name": "Artist Name"}],
+            "preview_url": "URL of preview"
+        },
+        ...
+    ]
+}
+        </pre>
+        <p>This route returns a list of songs matching the search term.</p>
+    </div>
+
+    <div class="section">
+        <h2>2. Convert Song Info to Audio</h2>
+        <p>This endpoint accepts song details and fetches the song from Spotify, converts it, and uploads it to GitHub.</p>
+        <h3>Endpoint:</h3>
+        <p><code>POST /song-info-to-audio</code></p>
+        <h3>Request Body:</h3>
+        <pre>
+{
+    "songName": "Song Name",
+    "authorName": "Author Name",
+    "spotifyUrl": "Spotify song URL"
+}
+        </pre>
+        <h3>Response:</h3>
+        <pre>
+{
+    "success": true,
+    "audio_url": "URL to the audio file hosted on GitHub",
+    "song_name": "Song Name"
+}
+        </pre>
+        <p>This route takes the song information, processes it, and returns a URL to the audio file hosted on GitHub.</p>
+    </div>
+
+    <div class="section">
+        <h2>Test API Endpoints</h2>
+        <div class="test-buttons">
+            <button class="button" onclick="searchSpotifySong()">Test Search Spotify Song</button>
+            <button class="button" onclick="convertSongToAudio()">Test Convert Song Info to Audio</button>
+        </div>
+        <div id="responseBox" class="response-box">
+            <h3>Response:</h3>
+            <div id="loadingMessage" class="loading" style="display: none;">Loading...</div>
+            <pre id="responseData"></pre>
+        </div>
+    </div>
+
+    <h2>Example Usage with JavaScript</h2>
+    <div class="code-snippet">
+        <pre>
+fetch('/search-spotify-song', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ searchTerm: 'Bohemian Rhapsody' })
+})
+.then(response => response.json())
+.then(data => console.log(data));
+        </pre>
+    </div>
+
+    <div class="code-snippet">
+        <pre>
+fetch('/song-info-to-audio', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        songName: 'Bohemian Rhapsody',
+        authorName: 'Queen',
+        spotifyUrl: 'spotify_url_here'
+    })
+})
+.then(response => response.json())
+.then(data => console.log(data));
+        </pre>
+    </div>
+
+    <script>
+        async function searchSpotifySong() {
+            const responseBox = document.getElementById('responseBox');
+            const responseData = document.getElementById('responseData');
+            const loadingMessage = document.getElementById('loadingMessage');
+            loadingMessage.style.display = 'block';
+            responseData.textContent = '';
+            
+            try {
+                const response = await fetch('/search-spotify-song', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ searchTerm: 'Bohemian Rhapsody' })
+                });
+                const data = await response.json();
+                loadingMessage.style.display = 'none';
+                if (data.success) {
+                    responseData.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    responseData.textContent = `Error: ${data.error}`;
+                }
+            } catch (error) {
+                loadingMessage.style.display = 'none';
+                responseData.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function convertSongToAudio() {
+            const responseBox = document.getElementById('responseBox');
+            const responseData = document.getElementById('responseData');
+            const loadingMessage = document.getElementById('loadingMessage');
+            loadingMessage.style.display = 'block';
+            responseData.textContent = '';
+            
+            try {
+                const response = await fetch('/song-info-to-audio', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        songName: 'Believer',
+                        authorName: 'Imagine Dragons',
+                        spotifyUrl: 'https://open.spotify.com/track/0pqnGHJpmpxLKifKRmU6WP'
+                    })
+                });
+                const data = await response.json();
+                loadingMessage.style.display = 'none';
+                if (data.success) {
+                    responseData.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    responseData.textContent = `Error: ${data.error}`;
+                }
+            } catch (error) {
+                loadingMessage.style.display = 'none';
+                responseData.textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
+
+</body>
+</html>

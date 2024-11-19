@@ -18,11 +18,11 @@ spotify_token_cache = TTLCache(maxsize=1, ttl=3600)
 
 
 # Create a blueprint
-songRoutes = Flask(__name__)  
-CORS(songRoutes, resources={r"/*": {"origins": "*"}})  # Allow all origins
+app = Flask(__name__)  
+CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all origins
 
 # Define the directory to save downloads
-DOWNLOAD_FOLDER = os.path.join(songRoutes.root_path, 'downloads')
+DOWNLOAD_FOLDER = os.path.join(app.root_path, 'downloads')
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 
 # Load environment variables
@@ -63,10 +63,11 @@ def get_spotify_token():
         spotify_token_cache['token'] = token  # Cache the token
     return token
 
-@songRoutes.route('/', methods=['POST'])
-def nothing():
- return 1
-@songRoutes.route('/search-spotify-song', methods=['POST'])
+@app.route('/')
+def index():
+  return render_template('index.html')
+  
+@app.route('/search-spotify-song', methods=['POST'])
 def search_spotify_song():
     try:
         search_term = request.json.get('searchTerm', '').strip()
@@ -152,7 +153,7 @@ def fetch_spotify_data(song_url):
 def upload_to_github(filename, filepath):
     return github_upload_function(filename, filepath)
 
-@songRoutes.route('/song-info-to-audio', methods=['POST'])
+@app.route('/song-info-to-audio', methods=['POST'])
 def song_info_to_audio():
     start_time = time.time()  # Start time for the entire request
 
@@ -216,4 +217,4 @@ def song_info_to_audio():
 if __name__ == '__main__':
     import os
     port = int(os.environ.get("PORT", 5000))  # Use Render's dynamic PORT or default to 5000
-    songRoutes.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=True)

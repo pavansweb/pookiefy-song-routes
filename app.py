@@ -163,6 +163,8 @@ def song_info_to_audio():
         author_name = data.get('authorName')
         spotify_song_url = data.get('spotifyUrl')
 
+        print(song_name)
+
         if not all([song_name, author_name, spotify_song_url]):
             return jsonify({'success': False, 'error': 'songName, authorName, spotifyUrl are required'}), 400
 
